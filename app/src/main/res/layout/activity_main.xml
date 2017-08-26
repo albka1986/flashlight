@@ -3,17 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/background_dark"
+    android:background="@android:color/darker_gray"
     tools:context="com.ponomarenko.flashlight.MainActivity">
 
-    <ImageButton
-        android:background="@null"
-        android:id="@+id/switcher_btn"
+    <CheckBox
+        android:button="@drawable/custom_checkbox"
+        android:id="@+id/switcher_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/image_switcher_2"
         android:contentDescription="@string/switch_btn_description" />
 
 </RelativeLayout>
