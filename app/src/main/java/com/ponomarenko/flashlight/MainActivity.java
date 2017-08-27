@@ -5,17 +5,18 @@ import android.content.pm.PackageManager;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraManager;
 import android.os.Build;
+import android.hardware.Camera;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Camera camera;
     private CameraManager camManager;
-    private CheckBox switcherCheckbox;
     private String cameraId;
 
 
@@ -24,53 +25,81 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
+        }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
         switch (requestCode) {
             case 1: {
-                // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("yes", "yes");
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-                    }
-                    boolean hasSystemFeature = this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
-                    if (hasSystemFeature) {
-                        initializeSwitcherBtn();
-                    }
+                    initializeSwitcherBtn();
 
                 } else {
-                    Log.d("yes", "no");
-                    // permission denied, boo! Disable the
-                    // functionality that depends on this permission.
+                    finish();
                 }
-                return;
             }
-            // other 'case' lines to check for other
-            // permissions this app might request
         }
     }
 
     private void initializeSwitcherBtn() {
-        switcherCheckbox = (CheckBox) findViewById(R.id.switcher_checkbox);
+        boolean hasSystemFeature = this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+        if (!hasSystemFeature) {
+            return;
+        }
+
+        CheckBox switcherCheckbox = (CheckBox) findViewById(R.id.switcher_checkbox);
         switcherCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (b) {
-                    turnOnFlashlight();
+            public void onCheckedChanged(CompoundButton compoundButton, boolean turnedOff) {
+                if (turnedOff) {
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (camManager == null) {
+                            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+                        }
+                        turnOnFlashlightForSDKMore23();
+                    } else {
+                        turnOnFlashlightForSDKLess23();
+
+                    }
+
                 } else {
-                    turnOffFlashlight();
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (camManager == null) {
+                            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+                        }
+                        turnOffFlashlightForSDKMore23();
+                    } else {
+                        turnOffFlashlightForSDKLess23();
+                    }
                 }
             }
         });
     }
 
-    void turnOnFlashlight() {
+    private void turnOnFlashlightForSDKLess23() {
+        camera = Camera.open();
+        Camera.Parameters parameters = camera.getParameters();
+        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+        camera.setParameters(parameters);
+        camera.startPreview();
+    }
+
+    private void turnOffFlashlightForSDKLess23() {
+        camera = Camera.open();
+        Camera.Parameters parameters = camera.getParameters();
+        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+        camera.setParameters(parameters);
+        camera.stopPreview();
+    }
+
+    void turnOnFlashlightForSDKMore23() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 cameraId = camManager.getCameraIdList()[0];
@@ -81,7 +110,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    void turnOffFlashlight() {
+    void turnOffFlashlightForSDKMore23() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 camManager.setTorchMode(cameraId, false);
