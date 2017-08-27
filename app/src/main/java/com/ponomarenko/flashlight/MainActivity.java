@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
                         turnOnFlashlightForSDKMore23();
                     } else {
                         turnOnFlashlightForSDKLess23();
-
                     }
 
                 } else {
