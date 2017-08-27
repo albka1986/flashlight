@@ -2,4 +2,6 @@
 <resources>
     <string name="app_name">Фонарик</string>
     <string name="switch_btn_description">Вкл. / Выкл.</string>
+    <string name="share_app">Отправить ссылку на приложение</string>
+    <string name="contact_us">Написать разработчику</string>
 </resources>

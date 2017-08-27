@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">Flashlight</string>
     <string name="switch_btn_description">Switch</string>
+    <string name="share_app">Share the app</string>
+    <string name="contact_us">Contact us</string>
+    <string name="developer_email" translatable="false">albka1986@gmail.com</string>
+    <string name="email_subject" translatable="false">Feedback about the app \"Flashlight\"</string>
 </resources>
