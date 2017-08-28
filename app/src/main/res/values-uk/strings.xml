@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Ліхтарик</string>
+    <string name="contact_us">Написати розробнику</string>
+    <string name="share_app">Поділитись додатком</string>
+    <string name="switch_btn_description">Вімк. / Вимкн.</string>
+</resources>
