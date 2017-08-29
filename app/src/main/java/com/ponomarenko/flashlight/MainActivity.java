@@ -18,6 +18,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +35,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
+        } else{
+            initializeSwitcherBtn();
         }
     }
 
@@ -93,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
     private void initializeSwitcherBtn() {
         boolean hasSystemFeature = this.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
         if (!hasSystemFeature) {
+            Toast.makeText(this, "Flashlight wasn't found", Toast.LENGTH_SHORT).show();
             return;
         }
 
@@ -102,10 +106,7 @@ public class MainActivity extends AppCompatActivity {
             public void onCheckedChanged(CompoundButton compoundButton, boolean turnedOff) {
                 if (turnedOff) {
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        if (camManager == null) {
-                            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-                        }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         turnOnFlashlightForSDKMore23();
                     } else {
                         turnOnFlashlightForSDKLess23();
@@ -113,10 +114,7 @@ public class MainActivity extends AppCompatActivity {
 
                 } else {
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        if (camManager == null) {
-                            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-                        }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         turnOffFlashlightForSDKMore23();
                     } else {
                         turnOffFlashlightForSDKLess23();
@@ -135,14 +133,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void turnOffFlashlightForSDKLess23() {
-        camera = Camera.open();
-        Camera.Parameters parameters = camera.getParameters();
-        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-        camera.setParameters(parameters);
         camera.stopPreview();
+        camera.release();
     }
 
     void turnOnFlashlightForSDKMore23() {
+        if (camManager == null) {
+            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 cameraId = camManager.getCameraIdList()[0];
@@ -154,6 +152,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void turnOffFlashlightForSDKMore23() {
+        if (camManager == null) {
+            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 camManager.setTorchMode(cameraId, false);
