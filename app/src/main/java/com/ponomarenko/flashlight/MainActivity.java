@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
-        } else{
+        } else {
             initializeSwitcherBtn();
         }
     }
@@ -103,65 +103,42 @@ public class MainActivity extends AppCompatActivity {
         CheckBox switcherCheckbox = (CheckBox) findViewById(R.id.switcher_checkbox);
         switcherCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean turnedOff) {
-                if (turnedOff) {
+            public void onCheckedChanged(CompoundButton compoundButton, boolean state) {
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        turnOnFlashlightForSDKMore23();
-                    } else {
-                        turnOnFlashlightForSDKLess23();
-                    }
-
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    switchFlashlightSdkMore23(state);
                 } else {
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        turnOffFlashlightForSDKMore23();
-                    } else {
-                        turnOffFlashlightForSDKLess23();
-                    }
+                    turnOnFlashlightForSDKLess23(state);
                 }
             }
         });
     }
 
-    private void turnOnFlashlightForSDKLess23() {
-        camera = Camera.open();
-        Camera.Parameters parameters = camera.getParameters();
-        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        camera.setParameters(parameters);
-        camera.startPreview();
+    private void turnOnFlashlightForSDKLess23(boolean state) {
+        if (state) {
+            camera = Camera.open();
+            Camera.Parameters parameters = camera.getParameters();
+            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+            camera.setParameters(parameters);
+            camera.startPreview();
+        } else {
+            camera.stopPreview();
+            camera.release();
+        }
+
     }
 
-    private void turnOffFlashlightForSDKLess23() {
-        camera.stopPreview();
-        camera.release();
-    }
-
-    void turnOnFlashlightForSDKMore23() {
+    void switchFlashlightSdkMore23(boolean state) {
         if (camManager == null) {
             camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             try {
                 cameraId = camManager.getCameraIdList()[0];
-                camManager.setTorchMode(cameraId, true);   //Turn ON
+                camManager.setTorchMode(cameraId, state);   //Turn ON
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
         }
-    }
-
-    void turnOffFlashlightForSDKMore23() {
-        if (camManager == null) {
-            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            try {
-                camManager.setTorchMode(cameraId, false);
-            } catch (CameraAccessException e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 }
