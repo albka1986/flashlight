@@ -70,8 +70,7 @@ public class MainActivity extends AppCompatActivity {
         intent.setAction(Intent.ACTION_SEND);
 
         intent.setType("text/plain");
-        //TODO: past the link on the App in  Google Play  and set Enable for this item menu;
-//        intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_google_play));
+        intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_google_play));
         startActivity(Intent.createChooser(intent, "Share"));
     }
 
