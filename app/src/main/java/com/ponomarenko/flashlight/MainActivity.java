@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.hardware.Camera;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -26,12 +27,14 @@ public class MainActivity extends AppCompatActivity {
     private Camera camera;
     private CameraManager camManager;
     private String cameraId;
-
+    private CheckBox switcherCheckbox;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        switcherCheckbox = (CheckBox) findViewById(R.id.switcher_checkbox);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
@@ -66,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void closeApplication() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             this.finishAndRemoveTask();
-        }else {
+        } else {
             this.finishAffinity();
         }
     }
@@ -77,13 +80,11 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + TextUtils.join(",", new String[]{getString(R.string.developer_email)})));
         intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject));
         startActivityForResult(Intent.createChooser(intent, "Send message to admin via:"), MAIL_REQUEST);
-
     }
 
     private void shareApp() {
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_SEND);
-
         intent.setType("text/plain");
         intent.putExtra(Intent.EXTRA_TEXT, getString(R.string.url_google_play));
         startActivity(Intent.createChooser(intent, "Share"));
@@ -112,7 +113,19 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        CheckBox switcherCheckbox = (CheckBox) findViewById(R.id.switcher_checkbox);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (camManager == null) {
+                camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+                if (cameraId == null) {
+                    try {
+                        cameraId = camManager.getCameraIdList()[0];
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
         switcherCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean state) {
@@ -137,20 +150,14 @@ public class MainActivity extends AppCompatActivity {
             camera.stopPreview();
             camera.release();
         }
-
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     void switchFlashlightSdkMore23(boolean state) {
-        if (camManager == null) {
-            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            try {
-                cameraId = camManager.getCameraIdList()[0];
-                camManager.setTorchMode(cameraId, state);   //Turn ON
-            } catch (CameraAccessException e) {
-                e.printStackTrace();
-            }
+        try {
+            camManager.setTorchMode(cameraId, state);   //Turn ON
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
         }
     }
 }
