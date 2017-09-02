@@ -6,4 +6,5 @@
     <string name="developer_email" translatable="false">albka1986@gmail.com</string>
     <string name="email_subject" translatable="false">Feedback about the app \"Flashlight\"</string>
     <string name="url_google_play" translatable="false"><![CDATA[https://play.google.com/store/apps/details?id=com.ponomarenko.flashlight&hl=en]]></string>
+    <string name="exit">Exit</string>
 </resources>

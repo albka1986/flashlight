@@ -4,4 +4,5 @@
     <string name="contact_us">Написати розробнику</string>
     <string name="share_app">Поділитись додатком</string>
     <string name="switch_btn_description">Вімк. / Вимкн.</string>
+    <string name="exit">Закрити застосунок</string>
 </resources>

@@ -57,8 +57,20 @@ public class MainActivity extends AppCompatActivity {
             case R.id.meu_item_contact_us:
                 startEmailClient();
                 break;
+
+            case R.id.exit_btn:
+                closeApplication();
+                break;
         }
         return true;
+    }
+
+    private void closeApplication() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            this.finishAndRemoveTask();
+        }else {
+            this.finishAffinity();
+        }
     }
 
     private void startEmailClient() {

@@ -4,4 +4,5 @@
     <string name="switch_btn_description">Вкл. / Выкл.</string>
     <string name="share_app">Отправить ссылку на приложение</string>
     <string name="contact_us">Написать разработчику</string>
+    <string name="exit">Закрыть приложение</string>
 </resources>

@@ -8,4 +8,8 @@
     <item
         android:id="@+id/meu_item_contact_us"
         android:title="@string/contact_us" />
+
+    <item
+        android:id="@+id/exit_btn"
+        android:title="@string/exit" />
 </menu>
