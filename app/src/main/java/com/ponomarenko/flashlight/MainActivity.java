@@ -64,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private void startEmailClient() {
         Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:" + TextUtils.join(",", new String[]{getString(R.string.developer_email)})));
         intent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject));
-        startActivityForResult(Intent.createChooser(intent, "Invite friends"), MAIL_REQUEST);
+        startActivityForResult(Intent.createChooser(intent, "Send message to admin via:"), MAIL_REQUEST);
 
     }
 
