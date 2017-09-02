@@ -155,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     void switchFlashlightSdkMore23(boolean state) {
         try {
-            camManager.setTorchMode(cameraId, state);   //Turn ON
+            camManager.setTorchMode(cameraId, state);   //Turn ON-OFF
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
