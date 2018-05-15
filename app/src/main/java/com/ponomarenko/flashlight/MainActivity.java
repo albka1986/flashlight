@@ -1,5 +1,6 @@
 package com.ponomarenko.flashlight;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -11,7 +12,6 @@ import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -21,9 +21,10 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private static final int MAIL_REQUEST = 1110;
+    public static final int PERMISSION_REQUEST = 1;
     private Camera camera;
     private CameraManager camManager;
     private String cameraId;
@@ -34,10 +35,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        switcherCheckbox = (CheckBox) findViewById(R.id.switcher_checkbox);
+        switcherCheckbox = findViewById(R.id.switcher_checkbox);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, 1);
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.CAMERA}, PERMISSION_REQUEST);
         } else {
             initializeSwitcherBtn();
         }
@@ -63,6 +64,10 @@ public class MainActivity extends AppCompatActivity {
 
             case R.id.exit_btn:
                 closeApplication();
+                break;
+
+            default:
+                //do nothing
                 break;
         }
         return true;
@@ -91,17 +96,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case 1: {
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == 1) {
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
-                    initializeSwitcherBtn();
+                initializeSwitcherBtn();
 
-                } else {
-                    finish();
-                }
+            } else {
+                finish();
             }
         }
     }
@@ -113,15 +116,15 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (camManager == null) {
-                camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-                if (cameraId == null) {
-                    try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && camManager == null) {
+            camManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+            if (cameraId == null) {
+                try {
+                    if (camManager != null) {
                         cameraId = camManager.getCameraIdList()[0];
-                    } catch (CameraAccessException e) {
-                        e.printStackTrace();
                     }
+                } catch (CameraAccessException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -130,13 +133,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean state) {
 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    switchFlashlightSdkMore23(state);
-                } else {
-                    turnOnFlashlightForSDKLess23(state);
-                }
+                turnFlashLight(state);
             }
         });
+    }
+
+    private void turnFlashLight(boolean state) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            switchFlashlightSdkMore23(state);
+        } else {
+            turnOnFlashlightForSDKLess23(state);
+        }
     }
 
     private void turnOnFlashlightForSDKLess23(boolean state) {
