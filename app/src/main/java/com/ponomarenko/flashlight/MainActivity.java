@@ -14,6 +14,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -140,19 +141,23 @@ public class MainActivity extends Activity {
 
     private void turnFlashLight(boolean state) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            switchFlashlightSdkMore23(state);
+            turnOnAfterSdk23(state);
         } else {
-            turnOnFlashlightForSDKLess23(state);
+            turnOnLessSdk23(state);
         }
     }
 
-    private void turnOnFlashlightForSDKLess23(boolean state) {
+    private void turnOnLessSdk23(boolean state) {
         if (state) {
-            camera = Camera.open();
-            Camera.Parameters parameters = camera.getParameters();
-            parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-            camera.setParameters(parameters);
-            camera.startPreview();
+            try {
+                camera = Camera.open();
+                Camera.Parameters parameters = camera.getParameters();
+                parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                camera.setParameters(parameters);
+                camera.startPreview();
+            } catch (Exception e) {
+                Log.e(getClass().getSimpleName(), "turnOnLessSdk23: ", e);
+            }
         } else {
             camera.stopPreview();
             camera.release();
@@ -160,7 +165,7 @@ public class MainActivity extends Activity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    void switchFlashlightSdkMore23(boolean state) {
+    void turnOnAfterSdk23(boolean state) {
         try {
             camManager.setTorchMode(cameraId, state);   //Turn ON-OFF
         } catch (CameraAccessException e) {
